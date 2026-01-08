@@ -30,4 +30,4 @@ Route::get('/gcs-test/{path}', function ($path) {
   }, 200, [
     'Content-Type' => $mime,
   ]);
-});
+})->where('path', '.*');
