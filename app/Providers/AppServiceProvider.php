@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\FilesystemAdapter;
+use League\Flysystem\Filesystem;
+use League\Flysystem\GoogleCloudStorage\GoogleCloudStorageAdapter;
+use Google\Cloud\Storage\StorageClient;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -49,6 +54,24 @@ class AppServiceProvider extends ServiceProvider
         // Register activity log event listeners
         Event::listen(Login::class, LogSuccessfulLogin::class);
         Event::listen(Logout::class, LogSuccessfulLogout::class);
+
+        // Register Google Cloud Storage
+        Storage::extend('gcs', function ($app, $config) {
+            $client = new StorageClient([
+                'projectId' => $config['project_id'],
+                'keyFilePath' => base_path($config['key_file']),
+            ]);
+
+            $bucket = $client->bucket($config['bucket']);
+            $adapter = new GoogleCloudStorageAdapter($bucket);
+            $filesystem = new Filesystem($adapter);
+
+            return new FilesystemAdapter(
+                $filesystem,
+                $adapter,
+                $config
+            );
+        });
 
         Validator::extend('base64image', function ($attribute, $value, $parameters, $validator) {
             $explode = explode(',', $value);
