@@ -17,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -54,8 +55,12 @@ class PostResource extends Resource
                     ->columnSpanFull(),
                 Textarea::make('excerpt')
                     ->columnSpanFull(),
-                FileUpload::make('image')
-                    ->image(),
+                // FileUpload::make('image')
+                //     ->image(),
+                SpatieMediaLibraryFileUpload::make('image')
+                    ->collection('image')
+                    ->image()
+                    ->preserveFilenames(),
                 TextInput::make('seo_title')
                     ->maxLength(191),
                 Select::make('author_id')
